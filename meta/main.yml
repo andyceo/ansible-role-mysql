@@ -1,0 +1,21 @@
+---
+
+allow_duplicates: no
+
+dependencies:
+  - { role: andyceo.preconf }
+
+galaxy_info:
+  author: andyceo
+  description: Install MySQL and allow to adjust some MySQL settings. Also allow to create databases, users and handle privilleges.
+  license: "license (BSD, MIT)"
+  min_ansible_version: 1.5
+  platforms:
+  - name: Ubuntu
+    versions:
+    - trusty
+  categories:
+    - database
+    - database:sql
+    - development
+    - system
