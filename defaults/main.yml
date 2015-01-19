@@ -51,4 +51,4 @@ mysql:
     thread_cache_size: 8
     max_connections: 20
     myisam-recover: DEFAULT
-
+    character-set-server: utf8
