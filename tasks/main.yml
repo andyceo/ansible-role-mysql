@@ -1,4 +1,4 @@
-- name: Install MySQL server and client
+- name: Install MySQL server, client and other useful utilities
   apt: pkg={{ item }}
   sudo: yes
   with_items:
@@ -6,6 +6,7 @@
     - mysql-server
     - mysql-client
     - python-mysqldb
+    - mytop
 
 - name: Change root user password on first run or when mysql.current_root_password was overrided with -e option
   mysql_user:
