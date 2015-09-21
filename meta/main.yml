@@ -2,9 +2,6 @@
 
 allow_duplicates: no
 
-dependencies:
-  - { role: andyceo.preconf }
-
 galaxy_info:
   author: andyceo
   description: Install MySQL and allow to adjust some MySQL settings. Also allow to create databases, users and handle privilleges.
