@@ -15,6 +15,9 @@ mysql:
       priv: test2.*:ALL
       state: absent
   settings:
+    # !!!Note: If you need to add parameter like options (without value, for
+    # example, like "skip-networking"), you must create the key equall value:
+    # skip-networking = skip-networking
 
     # InnoDB settings
     innodb_buffer_pool_size: 1024M
@@ -45,6 +48,7 @@ mysql:
     max_heap_table_size: 32M
     tmp_table_size: 32M
 
+    skip-networking: skip-networking
     bind-address: 127.0.0.1
     max_allowed_packet: 16M
     thread_stack: 192K

@@ -33,5 +33,9 @@ max_binlog_size         = 100M
 # See defaults/main.yml for comments.
 
 {% for key, value in mysql.settings.iteritems() | sort %}
+{% if key == value %}
+{{ key }}
+{% else %}
 {{ key }} = {{ value }}
+{% endif %}
 {% endfor %}
