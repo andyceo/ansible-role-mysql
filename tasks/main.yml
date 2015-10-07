@@ -35,15 +35,16 @@
 
 - meta: flush_handlers
 
-- name: (Re)Create databases
+- name: Create/remove MySQL databases
   mysql_db:
     login_user=root
     login_password={{ mysql.root_password }}
-    name={{ item }}
-    state=present
-  with_items: mysql.databases
+    name={{ item.key }}
+    state={{ item.value.state | default('present') }}
+  with_dict: mysql.databases
+  when: item.value.state is undefined or item.value.state in ['absent', 'present']
 
-- name: (Re)Create database users
+- name: Create/update MySQL users
   mysql_user:
     login_user=root
     login_password={{ mysql.root_password }}
@@ -52,3 +53,29 @@
     priv={{ item.value.priv }}
     state={{ item.value.state | default('present') }}
   with_dict: mysql.users
+
+- name: Copy files to the MySQL server to import
+  copy:
+    src={{ item.value.target }}
+    dest=/tmp/{{ item.value.target | basename }}
+  with_dict: mysql.databases
+  when: item.value.target is defined and item.value.state is defined and item.value.state == 'import'
+
+- name: Create MySQL databases for import
+  mysql_db:
+    login_user=root
+    login_password={{ mysql.root_password }}
+    name={{ item.key }}
+    state=present
+  with_dict: mysql.databases
+  when: item.value.target is defined and item.value.state is defined and item.value.state == 'import'
+
+- name: Import MySQL databases
+  mysql_db:
+    login_user=root
+    login_password={{ mysql.root_password }}
+    name={{ item.key }}
+    state=import
+    target=/tmp/{{ item.value.target | basename }}
+  with_dict: mysql.databases
+  when: item.value.target is defined and item.value.state is defined and item.value.state == 'import'

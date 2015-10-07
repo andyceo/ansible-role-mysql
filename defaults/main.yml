@@ -3,8 +3,11 @@ mysql:
   root_password: ''
   current_root_password: ''
   databases:
-     - test1
-     - test2
+    test1:
+      state: import
+      target: test1.sql
+    test2:
+      state: absent
   users:
     test1:
       password: test1pass
