@@ -8,6 +8,11 @@
     - python-mysqldb
     - mytop
 
+- name: Install AutoMySQLBackup, if needed
+  apt: pkg=automysqlbackup
+  sudo: yes
+  when: mysql.automysqlbackup.enabled
+
 - name: Change root user password on first run or when mysql.current_root_password was overrided with -e option
   mysql_user:
     login_user=root
@@ -70,6 +75,9 @@
   with_dict: mysql.databases
   when: item.value.target is defined and item.value.state is defined and item.value.state == 'import'
 
+# @todo: remove this comment when update ansible.
+# note about https://github.com/ansible/ansible/issues/8137
+# using non-alphabetical symbols in login_password cause errors on import
 - name: Import MySQL databases
   mysql_db:
     login_user=root
@@ -79,3 +87,23 @@
     target=/tmp/{{ item.value.target | basename }}
   with_dict: mysql.databases
   when: item.value.target is defined and item.value.state is defined and item.value.state == 'import'
+
+- name: Create AutoMySQLBackup directory
+  file:
+    path={{  mysql.automysqlbackup.settings.backupdir  }}
+    state=directory
+    owner=root
+    group=root
+    mode=0755
+  sudo: yes
+  when: mysql.automysqlbackup.enabled
+
+- name: Copy AutoMySQLBackup settings file
+  template:
+    src=automysqlbackup.conf.j2
+    dest=/etc/default/automysqlbackup
+    owner=root
+    group=root
+    mode=0644
+  sudo: yes
+  when: mysql.automysqlbackup.enabled

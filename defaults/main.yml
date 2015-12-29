@@ -61,3 +61,43 @@ mysql:
     max_connections: 20
     myisam-recover: DEFAULT
     character-set-server: utf8
+  automysqlbackup:
+    enabled: no
+
+    # Note that this settings is a bash variables, so if you want
+    # to use bash expressions and variables in this settings,
+    # you need to double-quote variable value like this: '"$DBNAMES"'
+
+    # Also, note that order of variables appearence is matter!
+    # see variables_order parameter.
+
+    settings:
+      username: |
+        `grep user /etc/mysql/debian.cnf | tail -n 1 | cut -d"=" -f2 | awk '{print $1}'`
+      password: |
+        `grep password /etc/mysql/debian.cnf | tail -n 1 | cut -d"=" -f2 | awk '{print $1}'`
+      dbhost: "localhost"
+      dbnames: |
+        `mysql --defaults-file=/etc/mysql/debian.cnf --execute="SHOW DATABASES" | awk '{print $1}' | grep -v ^Database$ | grep -v ^mysql$ | grep -v ^performance_schema$ | grep -v ^information_schema$ | tr \\\r\\\n ,\ `
+      backupdir: "/var/lib/automysqlbackup"
+      mailcontent: "quiet"
+      maxattsize: "4000"
+      mailaddr: "root@example.com"
+      mdbnames: '"$DBNAMES"'
+      dbexclude: ""
+      create_database: "no"
+      sepdir: "yes"
+      doweekly: 7
+      comp: gzip
+      commcomp: "no"
+      latest: "yes"
+      max_allowed_packet: ""
+      socket: ""
+      prebackup: ""
+      postbackup: ""
+      routines: "yes"
+
+    # The variables order is matter, because in automysqlbackup config
+    # one variable can use another one, defined earlier.
+
+    variables_order: ['username', 'password', 'dbhost', 'dbnames', 'backupdir', 'mailcontent', 'maxattsize', 'mailaddr', 'mdbnames', 'dbexclude', 'create_database', 'sepdir', 'doweekly', 'comp', 'commcomp', 'latest', 'max_allowed_packet', 'socket', 'prebackup', 'postbackup', 'routines']

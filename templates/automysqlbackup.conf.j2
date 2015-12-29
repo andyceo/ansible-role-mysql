@@ -1,0 +1,3 @@
+{% for variable in mysql.automysqlbackup.variables_order %}
+{{ variable|upper }}={{ mysql.automysqlbackup.settings[variable] }}
+{% endfor %}
