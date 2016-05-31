@@ -1,6 +1,5 @@
 - name: Install MySQL server, client and other useful utilities
   apt: pkg={{ item }}
-  sudo: yes
   with_items:
     - mysql-common
     - mysql-server
@@ -10,7 +9,6 @@
 
 - name: Install AutoMySQLBackup, if needed
   apt: pkg=automysqlbackup
-  sudo: yes
   when: mysql.automysqlbackup.enabled
 
 - name: Change root user password on first run or when mysql.current_root_password was overrided with -e option
@@ -35,7 +33,6 @@
     owner=root
     group=root
     mode=0644
-  sudo: yes
   notify: mysql-restart
 
 - meta: flush_handlers
@@ -46,7 +43,7 @@
     login_password={{ mysql.root_password }}
     name={{ item.key }}
     state={{ item.value.state | default('present') }}
-  with_dict: mysql.databases
+  with_dict: "{{ mysql.databases }}"
   when: item.value.state is undefined or item.value.state in ['absent', 'present']
 
 - name: Create/update MySQL users
@@ -57,13 +54,13 @@
     password={{ item.value.password }}
     priv={{ item.value.priv }}
     state={{ item.value.state | default('present') }}
-  with_dict: mysql.users
+  with_dict: "{{ mysql.users }}"
 
 - name: Copy files to the MySQL server to import
   copy:
     src={{ item.value.target }}
     dest=/tmp/{{ item.value.target | basename }}
-  with_dict: mysql.databases
+  with_dict: "{{ mysql.databases }}"
   when: item.value.target is defined and item.value.state is defined and item.value.state == 'import'
 
 - name: Create MySQL databases for import
@@ -72,7 +69,7 @@
     login_password={{ mysql.root_password }}
     name={{ item.key }}
     state=present
-  with_dict: mysql.databases
+  with_dict: "{{ mysql.databases }}"
   when: item.value.target is defined and item.value.state is defined and item.value.state == 'import'
 
 # @todo: remove this comment when update ansible.
@@ -85,7 +82,7 @@
     name={{ item.key }}
     state=import
     target=/tmp/{{ item.value.target | basename }}
-  with_dict: mysql.databases
+  with_dict: "{{ mysql.databases }}"
   when: item.value.target is defined and item.value.state is defined and item.value.state == 'import'
 
 - name: Create AutoMySQLBackup directory
@@ -95,7 +92,6 @@
     owner=root
     group=root
     mode=0755
-  sudo: yes
   when: mysql.automysqlbackup.enabled
 
 - name: Copy AutoMySQLBackup settings file
@@ -105,5 +101,4 @@
     owner=root
     group=root
     mode=0644
-  sudo: yes
   when: mysql.automysqlbackup.enabled
